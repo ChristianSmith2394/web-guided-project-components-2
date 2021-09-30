@@ -13,7 +13,7 @@
 
 // 👉 TASK 2- Select the "entry point", the element
 // inside of which we'll inject our dog cards 
-const entryPoint = null
+const entryPoint = document.querySelector('.entry')
 
 
 // 👉 TASK 3- `dogCardMaker` takes an object and returns a Dog Card.
@@ -23,6 +23,13 @@ function dogCardMaker({ imageURL, breed }) {
   const dogCard = document.createElement('div')
   const image = document.createElement('img')
   const heading = document.createElement('h3')
+
+  /*
+    <div>
+      <img></img>
+      <h3>Dog Breed</h3>
+    </div>
+  */
   // setting class names, attributes and text
   heading.textContent = `Breed: ${breed}`
   image.src = imageURL
@@ -50,9 +57,33 @@ function dogCardMaker({ imageURL, breed }) {
 //    * ON FAILURE: log the error to the console
 //    * IN ANY CASE: log "done" to the console
 
+import axios from 'axios'
+
 
 // 👉 (OPTIONAL) TASK 6- Wrap the fetching operation inside a function `getDogs`
 // that takes a breed and a count (of dogs)
+
+function getDogs(breed, count, selector) {
+  axios.get(`https://dog.ceo/api/breed/${breed}/images/random/${count}`)
+.then(resp => {
+  for (let i = 0; i <resp.data.message.length; i++) {
+    console.log(resp.data)
+    const dogObj = {
+    imageURL: resp.data.message[i],
+    breed: breed
+  }
+    const doggo = dogCardMaker(dogObj)
+    document.querySelector(selector).appendChild(doggo)
+  }
+})
+
+.catch(err => {
+  console.error(err)
+})
+.finally(() => {
+
+})
+}
 
 
 // 👉 (OPTIONAL) TASK 7- Put a button in index.html to 'get dogs' and add a click
@@ -62,3 +93,13 @@ function dogCardMaker({ imageURL, breed }) {
 // 👉 (OPTIONAL) TASK 8- Import the breeds from `breeds.js`
 // or request them from https://lambda-times-api.herokuapp.com/breeds
 // and loop over them, fetching a dog at each iteration
+
+axios.get('https://lambda-times-api.herokuapp.com/breeds')
+  .then(resp => {
+    for (let i = 0; i < resp.data.length; i++){
+      getDogs(resp.data[i], 2, '.entry')
+    }
+  })
+  .catch(err => {
+    console.error(err)
+  })
